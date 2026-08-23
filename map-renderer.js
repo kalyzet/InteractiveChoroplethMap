@@ -68,7 +68,7 @@ new jsVectorMap({
   },
 
   onRegionTooltipShow(event, tooltip, code) {
-    const regionName = tooltip.text();
+    const regionName = countryNamesID[code] || tooltip.text();
     const value = readerStats[code];
 
     if (value !== undefined) {

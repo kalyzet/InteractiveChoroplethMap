@@ -19,6 +19,7 @@ InteractiveChoroplethMap/
 ├── index.html        # Kerangka UI + pemanggilan CDN
 ├── style.css         # Tata letak, tema gelap, styling tooltip
 ├── data-source.js    # Layer data (objek readerStats)
+├── country-names.js  # Layer terjemahan nama negara (bahasa Indonesia)
 ├── map-renderer.js   # Logika inti render & interaksi
 ├── README.md         # Spesifikasi fitur + panduan menjalankan
 ├── DESIGN.md         # Pedoman desain visual
@@ -33,6 +34,7 @@ InteractiveChoroplethMap/
 | `index.html` | Kerangka UI | Kontainer `<div id="map-container">`; memuat jsvectormap v1.5.3 + dataset `world.js` via CDN jsdelivr; urutan load: library → data → renderer |
 | `style.css` | Presentasi | Background body `#333333`; kontainer full viewport (`100vh`); override tooltip: `rgba(0,0,0,0.75)`, border-radius 4px, box-shadow |
 | `data-source.js` | Manajemen Data | Objek global `readerStats` — pemetaan kode ISO 3166-1 alpha-2 → nilai persentase (24 negara sesuai MOCKUP-V1.md) |
+| `country-names.js` | Terjemahan | Objek global `countryNamesID` — pemetaan kode ISO 3166-1 alpha-2 → nama negara bahasa Indonesia (249 entri, mencakup seluruh 172 region di dataset `world.js`) |
 | `map-renderer.js` | Logika Inti | Inisialisasi `jsVectorMap`, konfigurasi `regionStyle`, kalkulasi gradasi biru manual + injeksi via `attributes`, handler `onRegionTooltipShow` |
 
 ### Alur Data (Data Flow)
@@ -59,6 +61,8 @@ Event hover pada region
       │
       ▼
 onRegionTooltipShow(event, tooltip, code)
+      │
+      ├─ Nama: countryNamesID[code] (fallback nama Inggris bawaan)
       │
       ├─ Ada data ──► tooltip: "[Nama Negara] [X]% of Readers"
       └─ Tanpa data ► tooltip: "[Nama Negara]" saja
