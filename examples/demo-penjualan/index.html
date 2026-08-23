@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Kedua — Palet Ungu</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css">
+  <style>
+    body { margin: 0; background-color: #1a1a2e; font-family: "Segoe UI", Arial, sans-serif; }
+    #sales-map { width: 100%; height: 100vh; }
+    .jsvectormap-tooltip {
+      background-color: rgba(0, 0, 0, 0.75);
+      border: none;
+      border-radius: 4px;
+      color: #f2f2f2;
+      padding: 8px 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="sales-map"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"></script>
+  <!-- Library inti dipakai ulang dari root proyek -->
+  <script src="../../map-renderer.js"></script>
+
+  <script>
+    // Projek kedua: data & palet berbeda, tanpa menyentuh file library.
+    DemographicMap.init({
+      selector: "#sales-map",
+      data: { US: 120, GB: 45, DE: 38, JP: 60, AU: 22, BR: 15 },
+      colorScale: ["#e0c3fc", "#6a1b9a"],
+      defaultFill: "#3a3a5c",
+      tooltipFormat: "{name}: {value} sales",
+      zoom: true,
+      onLoaded() {
+        console.log("Demo kedua siap");
+      }
+    });
+  </script>
+</body>
+</html>

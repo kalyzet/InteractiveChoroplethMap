@@ -93,9 +93,69 @@ onRegionTooltipShow(event, tooltip, code)
 
 ---
 
+## Versi 2 (V2) — Refactor Public API
+
+**Status:** Selesai dan teruji berjalan
+
+### Ringkasan
+
+`map-renderer.js` diubah dari skrip eksekusi-langsung menjadi mini-library `DemographicMap` (pola IIFE) dengan satu titik masuk: `DemographicMap.init(options)`. Projek konsumen kini cukup memanggil `init()` dengan konfigurasinya sendiri — tanpa menyentuh file library. Terbukti lewat contoh projek kedua (`examples/demo-penjualan/`) yang memakai data, palet ungu, selektor, dan format tooltip berbeda.
+
+### Struktur File
+
+```
+InteractiveChoroplethMap/
+├── index.html                  # Demo utama
+├── style.css                   # Tata letak & tema demo utama
+├── map-renderer.js             # INTI LIBRARY — DemographicMap v2.0.0 (IIFE)
+├── main.js                     # Entry demo: pemanggilan DemographicMap.init()
+├── data-source.js              # Data mockup (konsumsi demo, bukan bagian inti)
+├── country-names.js            # Locale bahasa Indonesia (opsional)
+├── examples/
+│   └── demo-penjualan/         # Contoh "projek kedua" — bukti reusability
+│       └── index.html          #   palet ungu, zoom aktif, data berbeda
+└── *.md                        # README, DESIGN, TODO, MOCKUP-V1, PLAN, ARCHITECTURE
+```
+
+### API Publik
+
+```js
+DemographicMap.init({
+  selector: "#map-container",           // target kontainer peta
+  map: "world",                          // dataset jsvectormap
+  data: { ID: 85, US: 30.5 },           // { kodeISO: nilai }
+  colorScale: ["#b8d8f2", "#0d3a66"],   // gradasi [nilaiRendah, nilaiTinggi]
+  defaultFill: "#f2f2f2",               // warna negara tanpa data
+  hoverOpacity: 0.8,
+  locale: countryNamesID,                // opsional: { kodeISO: namaLokal }
+  tooltipFormat: "{name} {value}% of Readers",
+  zoom: false,                           // scroll-zoom + tombol zoom
+  onRegionHover: fn(code, value),        // callback opsional
+  onRegionClick: fn(code, value),
+  onLoaded: fn()
+});
+```
+
+Semua opsi punya default yang identik dengan tampilan V1; `init()` mengembalikan instance jsVectorMap untuk kontrol lanjutan oleh konsumen.
+
+### Perubahan dari V1
+
+| Aspek | V1 | V2 |
+|---|---|---|
+| Titik masuk | Eksekusi langsung saat load | `DemographicMap.init(options)` |
+| Konfigurasi | Hardcoded di dalam renderer | Opsi + DEFAULTS |
+| Helper warna | Global (tumpah ke scope) | Dienkapsulasi di IIFE |
+| Konsumsi ulang | Edit file library | Cukup panggil `init()` dengan config baru |
+
+### Pengujian
+
+- Semua aset HTTP 200 via server lokal (demo utama + demo kedua)
+- Smoke test Node dengan mock `jsVectorMap`: selector, zoom flags, `defaultFill`, hasil gradasi (`ID → #0d3a66`, `RU → #b8d8f2`, `US → #6389ac`) dan format tooltip terverifikasi
+
+---
+
 ## Rencana Versi Berikutnya (Backlog)
 
-- [ ] Aktifkan zoom/pan interaktif (`zoomOnScroll`, tombol zoom)
-- [ ] Sumber data eksternal (SQLite / API endpoint) menggantikan mockup statis
-- [ ] Legenda gradasi warna sebagai indikator skala persentase
-- [ ] Responsivitas lanjutan untuk layar mobile
+- [ ] V3 — Zoom/pan interaktif di demo utama, legenda gradasi warna, responsivitas mobile
+- [ ] V4 — Data adapter: static object / fetch JSON / API endpoint / persiapan SQLite
+- [ ] V5 — ES Modules atau bundel tunggal, locale sebagai plugin, versioning semantik

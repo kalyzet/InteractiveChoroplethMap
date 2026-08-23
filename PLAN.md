@@ -40,9 +40,9 @@ DemographicMap.init({
 
 ### Kriteria Selesai
 
-- [ ] Halaman demo tetap tampil identik dengan V1
-- [ ] Projek kedua (dummy) berhasil memakai library dengan data & palet warna berbeda hanya lewat konfigurasi
-- [ ] Tidak ada lagi global variable wajib antar file inti
+- [x] Halaman demo tetap tampil identik dengan V1
+- [x] Projek kedua (dummy) berhasil memakai library dengan data & palet warna berbeda hanya lewat konfigurasi → `examples/demo-penjualan/index.html`
+- [x] Tidak ada lagi global variable wajib antar file inti (helper dienkapsulasi dalam IIFE)
 
 ---
 
@@ -108,7 +108,7 @@ DemographicMap.init({
 | Versi | Status |
 |---|---|
 | V1 — Prototipe kloroplet dasar | ✅ Selesai (lihat ARCHITECTURE.md) |
-| V2 — Refactor Public API | 🔜 Berikutnya |
-| V3 — Fitur visual & interaksi | Belum dimulai |
+| V2 — Refactor Public API | ✅ Selesai (lihat ARCHITECTURE.md) |
+| V3 — Fitur visual & interaksi | 🔜 Berikutnya |
 | V4 — Data adapter | Belum dimulai |
 | V5 — Packaging & i18n | Belum dimulai |
