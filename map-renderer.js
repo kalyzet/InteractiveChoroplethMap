@@ -73,7 +73,8 @@ new jsVectorMap({
 
     if (value !== undefined) {
       tooltip.text(`${regionName} ${value}% of Readers`);
+    } else {
+      tooltip.text(regionName);
     }
-    // Negara tanpa data: hanya tampilkan nama (default)
   }
 });
