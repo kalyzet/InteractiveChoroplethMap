@@ -1,3 +1,46 @@
+// jsvectormap tidak mendukung interpolasi gradasi numerik pada series
+// (OrdinalScale hanya memetakan key -> warna), sehingga gradasi biru
+// dihitung manual dan disuntikkan via opsi `attributes`.
+
+const COLOR_MIN = "#b8d8f2"; // nilai rendah
+const COLOR_MAX = "#0d3a66"; // nilai tinggi
+
+function hexToRgb(hex) {
+  return [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16)
+  ];
+}
+
+function rgbToHex(rgb) {
+  return (
+    "#" +
+    rgb
+      .map((c) => Math.round(c).toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
+function interpolateColor(ratio) {
+  const from = hexToRgb(COLOR_MIN);
+  const to = hexToRgb(COLOR_MAX);
+  return rgbToHex(from.map((c, i) => c + (to[i] - c) * ratio));
+}
+
+function buildRegionAttributes(stats) {
+  let max = 0;
+  for (const value of Object.values(stats)) {
+    if (value > max) max = value;
+  }
+
+  const attributes = {};
+  for (const [code, value] of Object.entries(stats)) {
+    attributes[code] = interpolateColor(max === 0 ? 0 : value / max);
+  }
+  return attributes;
+}
+
 new jsVectorMap({
   selector: "#map-container",
   map: "world",
@@ -18,10 +61,8 @@ new jsVectorMap({
   series: {
     regions: [
       {
-        values: readerStats,
-        scale: ["#b8d8f2", "#0d3a66"],
-        normalizeFunction: "polynomial",
-        attribute: "fill"
+        attribute: "fill",
+        attributes: buildRegionAttributes(readerStats)
       }
     ]
   },
