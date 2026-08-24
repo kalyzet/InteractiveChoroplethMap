@@ -4,6 +4,16 @@ Semua perubahan penting pada DemographicMap didokumentasikan di sini.
 Format mengikuti [Semantic Versioning](https://semver.org/) — perubahan
 breaking ditandai **BREAKING**.
 
+## [5.0.1] — Restrukturisasi Direktori
+
+- Library bundle pindah ke `dist/map-renderer.js` (pola konvensional distribusi)
+- Dokumentasi teknis & riwayat versi dipindah ke `docs/` — hanya `README.md`
+  yang tersisa di root
+- `data-source.js` dihapus (contoh static adapter kini terdokumentasi inline
+  di README bagian Data Adapter; mockup asli tersimpan di `docs/MOCKUP-V1.md`)
+- Semua referensi path di demo, contoh, dan dokumentasi diperbarui
+- README ditulis ulang untuk publik + lisensi proyek: **MIT** (`LICENSE`)
+
 ## [5.0.0] — Packaging & i18n Plugin (V5)
 
 - Locale kini berupa **plugin**: `DemographicMap.registerLocale("kode", {...})`

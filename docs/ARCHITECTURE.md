@@ -232,22 +232,29 @@ Library distibusikan sebagai **single-file bundle** (global `DemographicMap`, sa
 
 ### Struktur File Akhir
 
+> Setelah restrukturisasi direktori (lihat CHANGELOG 5.0.1), library pindah ke
+> `dist/` dan seluruh dokumentasi teknis ke `docs/`. Pohon di bawah mencerminkan
+> kondisi terkini.
+
 ```
 InteractiveChoroplethMap/
 ├── index.html                  # Demo utama
 ├── style.css                   # Tema demo utama
-├── map-renderer.js             # INTI LIBRARY — single-file bundle v5.0.0
 ├── main.js                     # Entry demo utama
+├── dist/
+│   └── map-renderer.js         # INTI LIBRARY — single-file bundle v5.0.0
 ├── locales/
 │   └── id.js                   # Plugin locale bahasa Indonesia
 ├── data/
 │   └── reader-stats.json       # Data demo utama (via adapter json)
 ├── database/
-│   └── schema.sql              # Persiapan skema SQLite
+│   ├── schema.sql              # Skema SQLite
+│   ├── build_demo_db.py        # Generator peta.db
 ├── examples/
-│   └── demo-penjualan/         # Contoh projek kedua
-├── data-source.js              # Legacy: contoh static adapter (tidak dimuat)
-└── *.md                        # README, DESIGN, TODO, MOCKUP-V1, PLAN, ARCHITECTURE, CHANGELOG
+│   ├── demo-penjualan/         # Contoh projek kedua
+│   └── demo-sqlite/            # Demo SQLite runtime (+ peta.db)
+└── docs/                       # ARCHITECTURE, CHANGELOG, DESIGN,
+                                # PLAN, TODO, MOCKUP-V1 + README di root
 ```
 
 ### Pengujian

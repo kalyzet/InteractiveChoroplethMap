@@ -1,65 +1,47 @@
-Proyek ini adalah template pengembangan mandiri untuk merender peta kloroplet (choropleth) interaktif. Tujuannya adalah menampilkan persentase distribusi data demografi berdasarkan negara menggunakan manipulasi SVG.
-Sebenarnya tidak sampai sekompleks membuat "framework" utuh dari awal, tapi lebih ke merakit sebuah template modular atau prototipe mandiri (standalone). Karena eksekusinya menggunakan HTML, CSS, dan JavaScript murni, pendekatannya memang terasa seperti merancang mini-framework sendiri.
-Memisahkan alur sistem ke dalam beberapa modul spesifik sangat identik dengan prinsip saat membangun standalone web utility pada umumnya. Hal ini membuat logika pemrosesan data tidak bertumpuk dengan struktur tampilan.
+# DemographicMap
 
-Berikut adalah draf spesifikasi fitur Peta Demografi yang bisa kamu jadikan pedoman teknis:
+> Mini-library JavaScript murni untuk peta kloroplet (choropleth) dunia yang interaktif — satu file bundle, tanpa build tooling, tanpa framework.
 
-### 1. Spesifikasi Fungsional Fitur
+[![Version](https://img.shields.io/badge/version-5.0.1-blue)](docs/CHANGELOG.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
+[![Dependency](https://img.shields.io/badge/library-jsvectormap%201.5.3-orange)](https://github.com/themustafaomar/jsvectormap)
+[![Stack](https://img.shields.io/badge/stack-vanilla%20JS%20%7C%20HTML%20%7C%20CSS-green)]()
 
-- **Visualisasi Kloroplet (Choropleth):** Poligon negara diwarnai secara dinamis berdasarkan nilai persentase (misal: 0% menggunakan abu-abu terang, >50% menggunakan gradasi biru pekat).
-- **Interaksi Tooltip Dinamis:** Sistem memunculkan _floating box_ kustom berisi teks "[Nama Negara] [X]% of Readers" saat kursor masuk (_hover_) ke area negara tertentu.
-- **Pelacakan Kursor (Mouse Tracking):** Posisi _tooltip_ harus secara presisi diperbarui mengikuti pergerakan sumbu X dan Y dari kursor _mouse_.
-- **Skalabilitas Vektor:** Rendering menggunakan format SVG agar peta mendukung fitur _zoom-in/zoom-out_ interaktif dan tetap tajam di berbagai resolusi layar.
+DemographicMap mengemas visualisasi choropleth — pewarnaan negara berdasarkan nilai data, tooltip dinamis pelacak kursor, legenda gradasi otomatis, dan zoom — ke dalam API tunggal `DemographicMap.init()`. Dirancang sebagai *standalone web utility*: modular, dapat dipakai ulang antar projek, dan cukup dijalankan lewat `<script>` biasa.
 
-### 2. Arsitektur Modul Sistem
+## Fitur
 
-Pemisahan struktur ke dalam beberapa _file_ terisolasi sangat penting agar logika presentasi visual dan _layer_ data tidak bercampur.
+- 🗺️ **Choropleth dinamis** — gradasi warna kontinu dihitung dari rasio nilai data
+- 💬 **Tooltip interaktif** — format teks kustom dengan token `{name}` dan `{value}`, melacak posisi kursor secara presisi
+- 📊 **Legenda otomatis** — bar gradien + label skala, bisa disembunyikan/tampilkan via ikon mata
+- 🔍 **Zoom & pan** — tombol zoom bergaya konsisten atau scroll-zoom opsional
+- 🔌 **Data adapter** — static object, fetch JSON, endpoint API, atau fungsi async kustom (termasuk SQLite runtime via sql.js)
+- 🌐 **Plugin locale** — terjemahan nama negara per bahasa tanpa menyentuh kode inti
+- 📱 **Responsif** — media query bawaan untuk layar mobile
 
-- **`index.html` (Kerangka UI):** Bertugas menampung elemen kontainer (seperti `<div id="map-container">`) dan mengeksekusi pemanggilan CDN _library_ eksternal.
-- **`style.css` (Tata Letak & Gaya):** Mengatur warna latar antarmuka menjadi gelap, mendesain _box-shadow_ pada _tooltip_, serta memastikan peta memenuhi ukuran layar dengan responsif.
-- **`data-source.js` (Manajemen Data):** Berisi objek JSON statis yang memetakan kode wilayah (ISO 3166-1 alpha-2, seperti `ID`, `RU`, `US`) dengan data angka analitik persentase.
-- **`map-renderer.js` (Logika Inti):** Berisi skrip JavaScript fungsional yang menarik data dari `data-source.js`, menyuntikkannya ke dalam _engine library_ peta, dan memanipulasi _event listener_ saat terjadi _hover_.
+## Demo
 
-### 3. Alur Pemrosesan (Data Flow)
+| Halaman | Isi |
+|---|---|
+| `/` | Demo utama: data pembaca 24 negara via fetch JSON, locale Indonesia |
+| [`examples/demo-penjualan/`](examples/demo-penjualan/) | Projek konsumen kedua: palet ungu, zoom aktif, legenda |
+| [`examples/demo-sqlite/`](examples/demo-sqlite/) | Data langsung dari file SQLite (`peta.db`) di browser |
 
-- **Inisialisasi DOM:** Saat halaman dimuat, skrip _renderer_ memanggil data koordinat dunia (GeoJSON) dan menggambar peta dasar (_base map_).
-- **Data Binding:** Sistem mencocokkan kode negara dari _file_ koordinat dengan struktur JSON data pembaca, lalu mengkalkulasi properti _fill color_ (warna daratan) secara otomatis.
-- **Render Parsial:** Perubahan data pada file konfigurasi hanya akan memicu pembaruan manipulasi DOM pada _tag path_ SVG spesifik, tanpa perlu memuat ulang keseluruhan halaman web.
+## Menjalankan
 
-### 4. Cara Menjalankan Proyek
-
-Proyek ini **tidak bisa dijalankan langsung dengan membuka `index.html`** lewat file explorer (protokol `file://`). Penyajian berkas via protokol tersebut memicu kegagalan pemuatan aset eksternal yang dikenal sebagai _CORS error_, sehingga peta tidak akan terender.
-
-Solusinya, sajikan proyek melalui server lokal sederhana bawaan Python:
+Proyek harus disajikan lewat HTTP server lokal (membuka `index.html` langsung via `file://` memicu CORS error):
 
 ```bash
 python -m http.server
 ```
 
-Perintah di atas akan menjalankan HTTP server statis pada direktori saat ini dan menyediakannya di `http://localhost:8000`. Buka alamat tersebut di browser untuk melihat peta.
+Lalu buka `http://localhost:8000`.
 
-Beberapa opsi tambahan yang bisa dipakai:
+Alternatif: ekstensi **Live Server** (VS Code) atau `npx serve`.
 
-```bash
-# Menentukan port kustom (misal: 3000)
-python -m http.server 3000
+## Menggunakan Library
 
-# Menjalankan dari direktori proyek tanpa pindah folder
-python -m http.server 8000 --directory path/ke/proyek
-
-# Menentukan bind address tertentu (default: semua interface)
-python -m http.server 8000 --bind 127.0.0.1
-```
-
-> Alternatif tanpa Python: ekstensi **Live Server** di VS Code, atau `npx serve` jika sudah terpasang Node.js.
-
-Setelah server berjalan, uji interaksi dengan menggerakkan kursor di atas peta — negara dengan data akan tersorot gradasi biru dan menampilkan tooltip persentase pembaca.
-
-### 5. Menggunakan DemographicMap sebagai Library
-
-Sejak V2, logika inti peta dikemas sebagai mini-library mandiri dalam satu file bundle (`map-renderer.js`, global `DemographicMap`). Projek lain cukup memuat jsvectormap + library + plugin locale, lalu memanggil `init()` — tanpa pernah mengedit file library.
-
-#### Setup Minimal
+### Setup Minimal
 
 ```html
 <!-- Dependency eksternal -->
@@ -67,74 +49,89 @@ Sejak V2, logika inti peta dikemas sebagai mini-library mandiri dalam satu file 
 <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"></script>
 
 <!-- Library + plugin (urutan penting) -->
-<script src="map-renderer.js"></script>
-<script src="locales/id.js"></script>   <!-- opsional -->
+<script src="dist/map-renderer.js"></script>
+<script src="locales/id.js"></script> <!-- opsional -->
+
+<div id="map-container"></div>
 ```
 
-#### Referensi Opsi `DemographicMap.init(options)`
+```js
+DemographicMap.init({
+  selector: "#map-container",
+  locale: "id",
+  colorScale: ["#b8d8f2", "#0d3a66"],
+  legend: { title: "Pembaca" },
+  zoomButtons: true,
+});
+```
+
+`init()` mengembalikan **Promise** → resolve instance jsVectorMap, atau `null` bila gagal memuat data.
+
+### Referensi Opsi
 
 | Opsi | Tipe | Default | Keterangan |
 |---|---|---|---|
 | `selector` | string | `"#map-container"` | Kontainer target render |
 | `map` | string | `"world"` | Dataset jsVectorMap |
 | `data` | object | `{}` | Static adapter: `{ "ID": 85, ... }` |
-| `dataAdapter` | object\|function | `null` | Sumber data async (lihat tabel di bawah); menimpa `data` |
-| `colorScale` | [hex, hex] | abu-biru | Gradasi warna `[nilaiRendah, nilaiTinggi]` |
+| `dataAdapter` | object \| function | `null` | Sumber data async (lihat [Data Adapter](#data-adapter)); menimpa `data` |
+| `colorScale` | [hex, hex] | biru | Gradasi warna `[nilaiRendah, nilaiTinggi]` |
 | `defaultFill` | hex | `"#f2f2f2"` | Warna negara tanpa data |
 | `hoverOpacity` | number | `0.8` | Opasitas saat hover |
-| `locale` | string\|object | `null` | `"id"` (plugin terdaftar) atau objek `{ "US": "Amerika Serikat" }` |
+| `locale` | string \| object | `null` | Kode plugin terdaftar (`"id"`) atau objek `{ "US": "Amerika Serikat" }` |
 | `tooltipFormat` | string | `"{name} {value}% of Readers"` | Token `{name}` & `{value}` |
-| `zoomOnScroll` | boolean | `false` | Zoom via scroll (membajak scroll halaman!) |
+| `zoomOnScroll` | boolean | `false` | Zoom via scroll (perhatikan: membajak scroll halaman) |
 | `zoomButtons` | boolean | `false` | Tombol +/− di pojok kiri atas |
-| `legend` | boolean\|object | `false` | `{ title?, unit?, position? }` — posisi: `bottom-right` (default), `bottom-left`, `top-right`, `top-left` |
+| `legend` | boolean \| object | `false` | `{ title?, unit?, position? }` — posisi: `bottom-right`, `bottom-left`, `top-right`, `top-left` |
 | `onLoaded()` | function | `null` | Peta selesai dirender |
 | `onRegionHover(code, value)` | function | `null` | Hover pada region |
 | `onRegionClick(code, value)` | function | `null` | Klik region |
 | `onError(err)` | function | `null` | Gagal memuat data |
 
-Return value: **Promise** → resolve instance jsVectorMap, atau `null` bila gagal.
+## Data Adapter
 
-#### Data Adapter
+Semua adapter resolve ke kontrak yang sama — objek datar `{ kodeISO: nilai }`:
 
 ```js
 // 1. Static object (tanpa dataAdapter)
-DemographicMap.init({ selector: "#peta", data: { ID: 85, US: 30 } });
+DemographicMap.init({ selector: '#peta', data: { ID: 85, US: 30 } });
 
 // 2. Fetch JSON datar { "ID": 85, ... }
-DemographicMap.init({ selector: "#peta", dataAdapter: { type: "json", url: "data.json" } });
+DemographicMap.init({ selector: '#peta', dataAdapter: { type: 'json', url: 'data.json' } });
 
 // 3. Endpoint API dengan struktur respons kustom
 DemographicMap.init({
-  selector: "#peta",
+  selector: '#peta',
   dataAdapter: {
-    type: "api",
-    url: "/api/stats",
-    parse: (json) => json.data   // wajib menghasilkan { kodeISO: nilai }
-  }
+    type: 'api',
+    url: '/api/stats',
+    parse: (json) => json.data, // wajib menghasilkan { kodeISO: nilai }
+  },
 });
 
 // 4. Fungsi async kustom (WebSocket, IndexedDB, SQLite via sql.js, dll)
-DemographicMap.init({ selector: "#peta", dataAdapter: async () => ambilDataDariDatabase() });
+DemographicMap.init({ selector: '#peta', dataAdapter: async () => ambilDataDariDatabase() });
 ```
 
-#### Contoh Adapter SQLite (sql.js / WebAssembly)
+Saat memakai `dataAdapter`, peta menampilkan overlay *"Memuat data..."* hingga siap; kegagalan ditampilkan sebagai pesan error merah + callback `onError`.
 
-Lihat `examples/demo-sqlite/` — memuat file `peta.db` langsung di browser
-tanpa backend. Polanya:
+### Contoh: SQLite Runtime (sql.js)
+
+Memuat file `.db` langsung di browser tanpa backend — lihat [`examples/demo-sqlite/`](examples/demo-sqlite/):
 
 ```js
-const SQL = await initSqlJs({ locateFile: f => CDN + f });
-const res = await fetch("peta.db");
+const SQL = await initSqlJs({ locateFile: (f) => CDN + f });
+const res = await fetch('peta.db');
 const db = new SQL.Database(new Uint8Array(await res.arrayBuffer()));
 
 DemographicMap.init({
-  selector: "#peta",
+  selector: '#peta',
   dataAdapter: async () => {
-    const stmt = db.prepare("SELECT code, value FROM latest_reader_stats");
+    const stmt = db.prepare('SELECT code, value FROM latest_reader_stats');
     const data = {};
     while (stmt.step()) data[stmt.get()[0]] = stmt.get()[1];
     return data;
-  }
+  },
 });
 ```
 
@@ -144,21 +141,60 @@ File database dibuat/diperbarui dengan skrip bawaan (tanpa dependency):
 python database/build_demo_db.py
 ```
 
-Skema lengkap tersedia di `database/schema.sql` — view `latest_reader_stats`
-menghasilkan snapshot terbaru per negara, siap dipetakan ke format adapter.
+Skema lengkap: [`database/schema.sql`](database/schema.sql) — view `latest_reader_stats` menghasilkan snapshot terbaru per negara.
 
-#### Plugin Bahasa
+## Plugin Bahasa
+
+Bahasa adalah plugin — menambah bahasa baru tidak pernah menyentuh kode inti:
 
 ```js
 // locales/es.js
 DemographicMap.registerLocale("es", { US: "Estados Unidos", ID: "Indonesia" });
 
-// lalu aktifkan:
-DemographicMap.init({ selector: "#peta", locale: "es", ... });
+// aktifkan:
+DemographicMap.init({ selector: "#peta", locale: "es" });
 ```
 
-Menambah bahasa baru tidak pernah menyentuh kode inti — cukup file baru di folder `locales/`. Negara tanpa terjemahan otomatis fallback ke nama bawaan dataset.
+Negara tanpa terjemahan otomatis fallback ke nama bawaan dataset. Plugin bawaan: [`locales/id.js`](locales/id.js) (249 entri, mencakup seluruh 172 region dataset dunia).
 
-#### Contoh Lengkap
+## Struktur Proyek
 
-Lihat `examples/demo-penjualan/index.html` — projek kedua dengan palet ungu, zoom aktif, legenda, dan data terpisah dari demo utama.
+```
+InteractiveChoroplethMap/
+├── index.html              # Demo utama
+├── style.css               # Tema demo utama
+├── main.js                 # Entry demo utama
+├── dist/
+│   └── map-renderer.js     # INTI LIBRARY — single-file bundle
+├── locales/
+│   └── id.js               # Plugin locale bahasa Indonesia
+├── data/
+│   └── reader-stats.json   # Data demo utama
+├── database/               # Skema SQLite + generator peta.db
+├── examples/               # Contoh projek konsumen lain
+└── docs/                   # Dokumentasi teknis & riwayat versi
+```
+
+Prinsip pemisahan: logika library (`dist/`), layer data (`data/`, `database/`), plugin (`locales/`), contoh konsumen (`examples/`), dan dokumentasi (`docs/`) tidak saling bercampur.
+
+## Dokumentasi Teknis
+
+Dokumentasi mendalam tersedia di folder [`docs/`](docs/):
+
+| Dokumen | Isi |
+|---|---|
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arsitektur teknis & progres tiap versi |
+| [CHANGELOG.md](docs/CHANGELOG.md) | Riwayat perubahan (semantic versioning) |
+| [PLAN.md](docs/PLAN.md) | Roadmap pengembangan V1–V5 |
+| [DESIGN.md](docs/DESIGN.md) | Pedoman desain visual |
+| [TODO.md](docs/TODO.md) | Checklist fase awal pengembangan |
+| [MOCKUP-V1.md](docs/MOCKUP-V1.md) | Mockup data versi pertama |
+
+## Rencana Lanjutan
+
+- [ ] Publish ke npm / GitHub Releases
+- [ ] Distribusi ES Module (`import DemographicMap from ...`)
+
+## Lisensi
+
+Dirilis di bawah [Lisensi MIT](LICENSE).
