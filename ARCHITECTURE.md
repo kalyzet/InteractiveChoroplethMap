@@ -173,7 +173,8 @@ Library kini mendukung zoom/pan, legenda gradasi warna otomatis, dan callback ev
 
 - Scroll-zoom dinonaktifkan di demo utama karena membajak scroll halaman dan terasa mengganggu — kini cukup tombol zoom
 - Legenda dipindah ke pojok kiri bawah (bottom-right menutupi area Asia Tenggara) dan dibuat lebih ringkas
-- v3.2.0: tombol tutup (×) diganti **ikon mata toggle** — klik untuk sembunyikan (ikon berubah jadi mata tertutup) dan klik lagi untuk tampilkan; panel legenda tidak pernah hilang permanen
+- v3.2.0: tombol tutup (×) diganti **ikon mata toggle** — klik untuk sembunyikan (ikon berubah jadi mata tertutup) dan klik lagi untuk tampilkan; panel legenda tidak pernah hilang permanen; ikon diposisikan di kiri-bawah card legenda
+- Tombol zoom +/− bawaan jsvectormap disamakan gayanya dengan card UI library (24px, border-radius 6px, background transparan gelap, rata kiri 15px); style UI kini di-inject sekaligus saat `init()`, bukan menunggu `onLoaded`
 
 ### Pengujian
 

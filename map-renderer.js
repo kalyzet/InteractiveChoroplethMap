@@ -56,7 +56,18 @@ const DemographicMap = (function () {
     ".dmap-legend.pos-bottom-right{right:15px;bottom:15px}" +
     ".dmap-legend.pos-bottom-left{left:15px;bottom:15px}" +
     ".dmap-legend.pos-top-right{right:15px;top:15px}" +
-    ".dmap-legend.pos-top-left{left:15px;top:45px}";
+    ".dmap-legend.pos-top-left{left:15px;top:15px}";
+
+  // Samakan gaya tombol zoom +/- bawaan jsvectormap dengan card legenda
+  const ZOOM_CSS =
+    ".jvm-zoom-btn{display:flex !important;align-items:center !important;" +
+    "justify-content:center !important;width:24px !important;height:24px !important;" +
+    "line-height:1 !important;font-size:15px;border-radius:6px;" +
+    "background:rgba(0,0,0,.55);color:#f2f2f2;left:15px;" +
+    "cursor:pointer;box-sizing:border-box;padding:0}" +
+    ".jvm-zoom-btn:hover{background:rgba(0,0,0,.8)}" +
+    ".jvm-zoom-btn.jvm-zoomin{top:15px}" +
+    ".jvm-zoom-btn.jvm-zoomout{top:44px}";
 
   const ICON_EYE =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"' +
@@ -75,7 +86,7 @@ const DemographicMap = (function () {
   function injectLegendCss() {
     if (cssInjected) return;
     const style = document.createElement("style");
-    style.textContent = LEGEND_CSS;
+    style.textContent = LEGEND_CSS + ZOOM_CSS;
     document.head.appendChild(style);
     cssInjected = true;
   }
@@ -200,6 +211,9 @@ const DemographicMap = (function () {
       o.zoomButtons = true;
     }
 
+    // Style UI library (legenda + tombol zoom) cukup di-inject sekali
+    injectLegendCss();
+
     const map = new jsVectorMap({
       selector: o.selector,
       map: o.map,
@@ -248,7 +262,6 @@ const DemographicMap = (function () {
 
       onLoaded() {
         if (o.legend && Object.keys(o.data).length > 0) {
-          injectLegendCss();
           const containerEl = document.querySelector(o.selector);
           if (containerEl) {
             renderLegend(containerEl, o, getMaxValue(o.data));
