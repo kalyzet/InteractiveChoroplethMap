@@ -1,11 +1,15 @@
 /*
- * DemographicMap v3.2.0
+ * DemographicMap v4.0.0
  * Mini-library choropleth di atas jsVectorMap.
  *
  * Konsumsi:
  *   DemographicMap.init({
  *     selector: "#map-container",
- *     data: { ID: 85, US: 30 },
+ *     // Sumber data — pilih salah satu:
+ *     data: { ID: 85, US: 30 },                          // static object
+ *     dataAdapter: { type: "json", url: "data.json" },   // fetch JSON
+ *     dataAdapter: { type: "api", url: "/api", parse: (j) => j.data },
+ *     dataAdapter: async () => ({ ID: 85 }),             // fungsi kustom
  *     colorScale: ["#b8d8f2", "#0d3a66"],
  *     locale: countryNamesID,
  *     tooltipFormat: "{name} {value}% of Readers",
@@ -13,16 +17,20 @@
  *     zoomButtons: true,
  *     legend: { title: "Persentase Pembaca" }
  *   });
+ *
+ * init() mengembalikan Promise yang resolve berupa instance jsVectorMap
+ * setelah data selesai dimuat dan peta terender.
  */
 const DemographicMap = (function () {
   "use strict";
 
-  const VERSION = "3.2.0";
+  const VERSION = "4.0.0";
 
   const DEFAULTS = {
     selector: "#map-container",
     map: "world",
     data: {},
+    dataAdapter: null,
     colorScale: ["#b8d8f2", "#0d3a66"],
     defaultFill: "#f2f2f2",
     hoverOpacity: 0.8,
@@ -33,7 +41,8 @@ const DemographicMap = (function () {
     legend: false,
     onRegionHover: null,
     onRegionClick: null,
-    onLoaded: null
+    onLoaded: null,
+    onError: null
   };
 
   const LEGEND_CSS =
@@ -69,6 +78,14 @@ const DemographicMap = (function () {
     ".jvm-zoom-btn.jvm-zoomin{top:15px}" +
     ".jvm-zoom-btn.jvm-zoomout{top:44px}";
 
+  // Overlay status loading/error saat data dimuat via adapter
+  const STATUS_CSS =
+    ".dmap-status{position:absolute;inset:0;z-index:20;display:flex;" +
+    "align-items:center;justify-content:center;pointer-events:none}" +
+    ".dmap-status-message{background:rgba(0,0,0,.75);border-radius:6px;" +
+    "padding:10px 16px;color:#f2f2f2;font-family:sans-serif;font-size:13px}" +
+    ".dmap-status.is-error .dmap-status-message{background:rgba(140,20,20,.85)}";
+
   const ICON_EYE =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"' +
     ' stroke-linecap="round" stroke-linejoin="round">' +
@@ -86,7 +103,7 @@ const DemographicMap = (function () {
   function injectLegendCss() {
     if (cssInjected) return;
     const style = document.createElement("style");
-    style.textContent = LEGEND_CSS + ZOOM_CSS;
+    style.textContent = LEGEND_CSS + ZOOM_CSS + STATUS_CSS;
     document.head.appendChild(style);
     cssInjected = true;
   }
@@ -202,6 +219,71 @@ const DemographicMap = (function () {
     containerEl.appendChild(legend);
   }
 
+  function showStatus(selector, message, isError) {
+    const containerEl = document.querySelector(selector);
+    if (!containerEl) return null;
+
+    let status = containerEl.querySelector(".dmap-status");
+    if (!status) {
+      status = document.createElement("div");
+      status.className = "dmap-status";
+      status.appendChild(document.createElement("div"));
+      containerEl.appendChild(status);
+    }
+    status.lastChild.className = "dmap-status-message";
+    status.lastChild.textContent = message;
+    status.classList.toggle("is-error", isError === true);
+    return status;
+  }
+
+  function hideStatus(selector) {
+    const containerEl = document.querySelector(selector);
+    if (!containerEl) return;
+    const status = containerEl.querySelector(".dmap-status");
+    if (status) status.remove();
+  }
+
+  /*
+   * Kontrak data adapter — semua bentuk resolve menjadi { kodeISO: nilai }.
+   * - object / { type: "static", data }      -> langsung dipakai
+   * - { type: "json", url }                  -> fetch JSON datar
+   * - { type: "api", url, parse? }           -> fetch endpoint, ekstrak via parse(json)
+   * - fungsi async                           -> bebas, wajib resolve objek datar
+   */
+  async function loadData(o) {
+    const src =
+      o.dataAdapter !== null && o.dataAdapter !== undefined
+        ? o.dataAdapter
+        : { type: "static", data: o.data };
+
+    if (typeof src === "function") {
+      return await src();
+    }
+
+    switch (src.type) {
+      case "static":
+        return src.data;
+
+      case "json":
+      case "api": {
+        const res = await fetch(src.url);
+        if (!res.ok) {
+          throw new Error(
+            "Permintaan data gagal: HTTP " + res.status + " (" + src.url + ")"
+          );
+        }
+        const json = await res.json();
+        if (src.type === "api" && typeof src.parse === "function") {
+          return src.parse(json);
+        }
+        return json;
+      }
+
+      default:
+        throw new Error("Tipe dataAdapter tidak dikenal: " + src.type);
+    }
+  }
+
   function init(userOptions) {
     const o = Object.assign({}, DEFAULTS, userOptions);
 
@@ -211,70 +293,96 @@ const DemographicMap = (function () {
       o.zoomButtons = true;
     }
 
-    // Style UI library (legenda + tombol zoom) cukup di-inject sekali
+    // Style UI library (legenda + tombol zoom + status) cukup di-inject sekali
     injectLegendCss();
 
-    const map = new jsVectorMap({
-      selector: o.selector,
-      map: o.map,
-
-      zoomOnScroll: o.zoomOnScroll,
-      zoomButtons: o.zoomButtons,
-
-      regionStyle: {
-        initial: {
-          fill: o.defaultFill
-        },
-        hover: {
-          fillOpacity: o.hoverOpacity
-        }
-      },
-
-      series: {
-        regions: [
-          {
-            attribute: "fill",
-            attributes: buildRegionAttributes(o.data, o.colorScale)
-          }
-        ]
-      },
-
-      onRegionTooltipShow(event, tooltip, code) {
-        const value = o.data[code];
-        const name = resolveName(o.locale, tooltip.text(), code);
-
-        tooltip.text(
-          value !== undefined
-            ? formatTooltip(o.tooltipFormat, name, value)
-            : name
-        );
-
-        if (typeof o.onRegionHover === "function") {
-          o.onRegionHover(code, value);
-        }
-      },
-
-      onRegionClick(event, code) {
-        if (typeof o.onRegionClick === "function") {
-          o.onRegionClick(code, o.data[code]);
-        }
-      },
-
-      onLoaded() {
-        if (o.legend && Object.keys(o.data).length > 0) {
-          const containerEl = document.querySelector(o.selector);
-          if (containerEl) {
-            renderLegend(containerEl, o, getMaxValue(o.data));
-          }
-        }
-
-        if (typeof o.onLoaded === "function") {
-          o.onLoaded();
-        }
+    // Boot async: muat data via adapter, lalu render peta.
+    // Mengembalikan Promise<jsVectorMap|null> (null saat gagal memuat data).
+    return (async () => {
+      if (o.dataAdapter) {
+        showStatus(o.selector, "Memuat data peta...", false);
       }
-    });
 
-    return map;
+      try {
+        o.data = await loadData(o);
+      } catch (err) {
+        hideStatus(o.selector);
+        showStatus(
+          o.selector,
+          "Gagal memuat data: " + err.message,
+          true
+        );
+        console.error("[DemographicMap]", err);
+        if (typeof o.onError === "function") {
+          o.onError(err);
+        }
+        return null;
+      }
+
+      hideStatus(o.selector);
+
+      const map = new jsVectorMap({
+        selector: o.selector,
+        map: o.map,
+
+        zoomOnScroll: o.zoomOnScroll,
+        zoomButtons: o.zoomButtons,
+
+        regionStyle: {
+          initial: {
+            fill: o.defaultFill
+          },
+          hover: {
+            fillOpacity: o.hoverOpacity
+          }
+        },
+
+        series: {
+          regions: [
+            {
+              attribute: "fill",
+              attributes: buildRegionAttributes(o.data, o.colorScale)
+            }
+          ]
+        },
+
+        onRegionTooltipShow(event, tooltip, code) {
+          const value = o.data[code];
+          const name = resolveName(o.locale, tooltip.text(), code);
+
+          tooltip.text(
+            value !== undefined
+              ? formatTooltip(o.tooltipFormat, name, value)
+              : name
+          );
+
+          if (typeof o.onRegionHover === "function") {
+            o.onRegionHover(code, value);
+          }
+        },
+
+        onRegionClick(event, code) {
+          if (typeof o.onRegionClick === "function") {
+            o.onRegionClick(code, o.data[code]);
+          }
+        },
+
+        onLoaded() {
+          if (o.legend && Object.keys(o.data).length > 0) {
+            const containerEl = document.querySelector(o.selector);
+            if (containerEl) {
+              renderLegend(containerEl, o, getMaxValue(o.data));
+            }
+          }
+
+          if (typeof o.onLoaded === "function") {
+            o.onLoaded();
+          }
+        }
+      });
+
+      return map;
+    })();
   }
 
   return { init, VERSION };

@@ -74,8 +74,8 @@ DemographicMap.init({
 
 ### Kriteria Selesai
 
-- [ ] Renderer tidak peduli asal data — semua adapter menghasilkan struktur sama
-- [ ] Demo memuat data via fetch JSON lokal tanpa CORS error
+- [x] Renderer tidak peduli asal data — semua adapter menghasilkan struktur sama
+- [x] Demo memuat data via fetch JSON lokal tanpa CORS error
 
 ---
 
@@ -110,5 +110,5 @@ DemographicMap.init({
 | V1 — Prototipe kloroplet dasar | ✅ Selesai (lihat ARCHITECTURE.md) |
 | V2 — Refactor Public API | ✅ Selesai (lihat ARCHITECTURE.md) |
 | V3 — Fitur visual & interaksi | ✅ Selesai (lihat ARCHITECTURE.md) |
-| V4 — Data adapter | 🔜 Berikutnya |
-| V5 — Packaging & i18n | Belum dimulai |
+| V4 — Data adapter | ✅ Selesai (lihat ARCHITECTURE.md) |
+| V5 — Packaging & i18n | 🔜 Berikutnya |

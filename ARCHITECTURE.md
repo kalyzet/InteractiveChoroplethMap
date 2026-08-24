@@ -183,7 +183,39 @@ Library kini mendukung zoom/pan, legenda gradasi warna otomatis, dan callback ev
 
 ---
 
+## Versi 4 (V4) — Data Adapter
+
+**Status:** Selesai dan teruji berjalan
+
+### Ringkasan
+
+Renderer kini tidak lagi terikat pada objek statis: `init()` menerima opsi `dataAdapter` yang memuat data secara async sebelum peta dirender. Semua adapter menghasilkan kontrak data yang sama — objek datar `{ kodeISO: nilai }`.
+
+### Kontrak Data Adapter
+
+| Bentuk | Perilaku |
+|---|---|
+| `data: { ID: 85 }` | Static object (kompatibilitas V1–V3, tetap didukung) |
+| `{ type: "static", data }` | Sama dengan di atas, eksplisit |
+| `{ type: "json", url }` | `fetch(url)` → JSON datar `{code: value}` |
+| `{ type: "api", url, parse? }` | `fetch` endpoint; respons diekstrak lewat callback `parse(json)` |
+| fungsi async | Bebas sumbernya (WebSocket, IndexedDB, kelak SQLite), wajib resolve objek datar |
+
+### Perilaku Baru
+
+- `DemographicMap.init()` sekarang mengembalikan **Promise** → resolve berupa instance jsVectorMap, atau `null` bila gagal memuat data
+- **Overlay status**: "Memuat data peta..." saat loading; pesan merah saat error (`onError(err)` terpanggil)
+- File `data-source.js` tidak lagi dimuat oleh demo utama — statusnya menjadi contoh penggunaan static adapter
+- **Persiapan SQLite**: `database/schema.sql` berisi skema `countries` + `reader_stats` + view `latest_reader_stats` (snapshot terbaru per negara) sebagai kontrak untuk adapter SQLite di masa depan
+
+### Pengujian
+
+- Smoke test Node (8 kasus): static/data lama, json, api+parse, custom async fn, HTTP error (overlay error + onError + resolve null), tipe tak dikenal, overlay loading
+- Semua aset HTTP 200 termasuk `data/reader-stats.json`; demo utama memuat data via fetch JSON tanpa CORS error
+
+---
+
 ## Rencana Versi Berikutnya (Backlog)
 
-- [ ] V4 — Data adapter: static object / fetch JSON / API endpoint / persiapan SQLite
 - [ ] V5 — ES Modules atau bundel tunggal, locale sebagai plugin, versioning semantik
+- [ ] Adapter runtime SQLite (mengonsumsi `database/schema.sql`)
