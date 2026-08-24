@@ -4,6 +4,19 @@ Semua perubahan penting pada DemographicMap didokumentasikan di sini.
 Format mengikuti [Semantic Versioning](https://semver.org/) — perubahan
 breaking ditandai **BREAKING**.
 
+## [5.1.0] — Distribusi ES Module
+
+- Sumber canonical library pindah ke `src/map-renderer.core.js` —
+  satu-satunya tempat mengedit kode inti
+- Generator `scripts/build-dist.mjs` (Node, tanpa dependency) membangun
+  dua varian dari sumber yang sama:
+  - `dist/map-renderer.js` — varian IIFE untuk `<script>` (perilaku tidak berubah)
+  - `dist/demographic-map.esm.js` — varian ESM (`import { init, registerLocale, VERSION }`)
+- Varian ESM tetap meng-attach `globalThis.DemographicMap` agar plugin locale
+  berformat `<script>` kompatibel di mode module
+- **BREAKING** (bagi yang mengedit `dist/` langsung): file di `dist/` kini
+  hasil generate — edit harus dilakukan di `src/` lalu build ulang
+
 ## [5.0.1] — Restrukturisasi Direktori
 
 - Library bundle pindah ke `dist/map-renderer.js` (pola konvensional distribusi)

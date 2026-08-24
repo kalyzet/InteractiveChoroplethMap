@@ -241,8 +241,13 @@ InteractiveChoroplethMap/
 ├── index.html                  # Demo utama
 ├── style.css                   # Tema demo utama
 ├── main.js                     # Entry demo utama
+├── src/
+│   └── map-renderer.core.js    # SUMBER CANONICAL library
+├── scripts/
+│   └── build-dist.mjs          # Generator dist/ (tanpa dependency)
 ├── dist/
-│   └── map-renderer.js         # INTI LIBRARY — single-file bundle v5.0.0
+│   ├── map-renderer.js         # Varian IIFE — hasil generate
+│   └── demographic-map.esm.js  # Varian ESM — hasil generate
 ├── locales/
 │   └── id.js                   # Plugin locale bahasa Indonesia
 ├── data/
@@ -262,6 +267,32 @@ InteractiveChoroplethMap/
 - Smoke test Node: registerLocale valid/invalid, locale string terdaftar/tak dikenal, objek kustom, evaluasi `locales/id.js`
 - Verifikasi tooltip end-to-end dengan mock: `US → "Amerika Serikat 30.5% of Readers"`, `IE → "Irlandia"`
 - Semua aset HTTP 200
+
+---
+
+## Versi 5.1 — Distribusi ES Module
+
+**Status:** Selesai dan teruji berjalan
+
+### Ringkasan
+
+Distribusi ganda dari satu sumber canonical: `src/map-renderer.core.js`
+(satu-satunya tempat edit kode inti) dibangun oleh
+`scripts/build-dist.mjs` (Node murni, tanpa dependency) menjadi dua varian:
+
+| Varian | Konsumsi |
+|---|---|
+| `dist/map-renderer.js` (IIFE) | `<script src="dist/map-renderer.js">` → global `DemographicMap` |
+| `dist/demographic-map.esm.js` | `import DemographicMap from ...` / named exports |
+
+Kedua varian meng-attach `globalThis.DemographicMap`, sehingga plugin locale
+(`locales/*.js`) kompatibel di kedua mode tanpa perubahan apa pun.
+
+### Pengujian
+
+- Smoke test Node 7 kasus: IIFE (VERSION 5.1.0, init, registerLocale), ESM
+  (named + default export), plugin locale `"id"` lewat global di mode ESM,
+  konsistensi versi antar varian
 
 ---
 
@@ -291,4 +322,5 @@ memanfaatkan adapter fungsi async kustom dari V4:
 
 ## Rencana Versi Berikutnya (Backlog)
 
-- [ ] (Opsional) publish npm / GitHub publik
+- [x] Publish ke GitHub Releases — https://github.com/kalyzet/InteractiveChoroplethMap/releases
+- [ ] Publish ke npm

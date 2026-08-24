@@ -1,11 +1,4 @@
 /*
- * DemographicMap v5.1.0 — FILE HASIL GENERATE, JANGAN DIEDIT
- * Sumber canonical: src/map-renderer.core.js
- * Regenerasi: node scripts/build-dist.mjs
- */
-
-const DemographicMap = (function () {
-/*
  * DemographicMap — SUMBER CANONICAL (v5.1.0)
  *
  * File ini adalah SATU-SATUNYA tempat mengedit kode library.
@@ -404,7 +397,3 @@ const DemographicMap = (function () {
   }
 
   return { init, VERSION, registerLocale };
-})();
-
-// Kompatibilitas plugin locale & akses lanjutan lewat global.
-globalThis.DemographicMap = DemographicMap;

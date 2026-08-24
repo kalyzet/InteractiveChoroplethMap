@@ -406,5 +406,10 @@ const DemographicMap = (function () {
   return { init, VERSION, registerLocale };
 })();
 
-// Kompatibilitas plugin locale & akses lanjutan lewat global.
+// Kompatibilitas plugin locale (<script> biasa memanggil global).
 globalThis.DemographicMap = DemographicMap;
+
+export const init = DemographicMap.init;
+export const registerLocale = DemographicMap.registerLocale;
+export const VERSION = DemographicMap.VERSION;
+export default DemographicMap;
