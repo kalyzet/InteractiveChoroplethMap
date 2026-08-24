@@ -1,9 +1,9 @@
-﻿// ============================================================
-// DemographicMap — Plugin Locale Bahasa Indonesia (v5)
+// ============================================================
+// DemographicMap — Plugin Locale Bahasa Indonesia
 //
 // Cara pakai:
-//   1. Muat SETELAH map-renderer.js:
-//      <script src="map-renderer.js"></script>
+//   1. Muat SETELAH dist/map-renderer.js:
+//      <script src="dist/map-renderer.js"></script>
 //      <script src="locales/id.js"></script>
 //   2. Aktifkan via opsi init: locale: "id"
 //
@@ -154,7 +154,7 @@ DemographicMap.registerLocale("id", {
   "NA": "Namibia",
   "NE": "Niger",
   "NG": "Nigeria",
-  "RE": "RÃ©union",
+  "RE": "Réunion",
   "RW": "Rwanda",
   "SC": "Seychelles",
   "SD": "Sudan",
@@ -181,7 +181,7 @@ DemographicMap.registerLocale("id", {
   "AR": "Argentina",
   "AW": "Aruba",
   "BB": "Barbados",
-  "BL": "Saint BarthÃ©lemy",
+  "BL": "Saint Barthélemy",
   "BM": "Bermuda",
   "BO": "Bolivia",
   "BR": "Brasil",
