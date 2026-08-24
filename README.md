@@ -113,9 +113,39 @@ DemographicMap.init({
   }
 });
 
-// 4. Fungsi async kustom (WebSocket, IndexedDB, SQLite, dll)
+// 4. Fungsi async kustom (WebSocket, IndexedDB, SQLite via sql.js, dll)
 DemographicMap.init({ selector: "#peta", dataAdapter: async () => ambilDataDariDatabase() });
 ```
+
+#### Contoh Adapter SQLite (sql.js / WebAssembly)
+
+Lihat `examples/demo-sqlite/` — memuat file `peta.db` langsung di browser
+tanpa backend. Polanya:
+
+```js
+const SQL = await initSqlJs({ locateFile: f => CDN + f });
+const res = await fetch("peta.db");
+const db = new SQL.Database(new Uint8Array(await res.arrayBuffer()));
+
+DemographicMap.init({
+  selector: "#peta",
+  dataAdapter: async () => {
+    const stmt = db.prepare("SELECT code, value FROM latest_reader_stats");
+    const data = {};
+    while (stmt.step()) data[stmt.get()[0]] = stmt.get()[1];
+    return data;
+  }
+});
+```
+
+File database dibuat/diperbarui dengan skrip bawaan (tanpa dependency):
+
+```bash
+python database/build_demo_db.py
+```
+
+Skema lengkap tersedia di `database/schema.sql` — view `latest_reader_stats`
+menghasilkan snapshot terbaru per negara, siap dipetakan ke format adapter.
 
 #### Plugin Bahasa
 

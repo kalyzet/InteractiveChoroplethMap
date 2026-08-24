@@ -113,4 +113,4 @@ DemographicMap.init({
 | V4 — Data adapter | ✅ Selesai (lihat ARCHITECTURE.md) |
 | V5 — Packaging & i18n | ✅ Selesai (lihat ARCHITECTURE.md) |
 
-**Roadmap V1–V5 tuntas.** Lanjutan opsional: adapter runtime SQLite, publish npm/GitHub.
+**Roadmap V1–V5 tuntas.** Ekstensi pasca-roadmap: adapter runtime SQLite via sql.js (✅ selesai, lihat `examples/demo-sqlite/`). Sisa opsional: publish npm/GitHub.

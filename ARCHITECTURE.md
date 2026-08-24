@@ -258,7 +258,30 @@ InteractiveChoroplethMap/
 
 ---
 
+## Ekstensi: Adapter SQLite Runtime (pasca-V5)
+
+**Status:** Selesai dan teruji berjalan
+
+Realisasi backlog "adapter runtime SQLite" — **tanpa perubahan pada library inti**,
+memanfaatkan adapter fungsi async kustom dari V4:
+
+- `database/build_demo_db.py` — skrip Python bawaan (modul `sqlite3`) untuk
+  generate `examples/demo-sqlite/peta.db` sesuai `database/schema.sql`;
+  data memuat dua periode untuk membuktikan view `latest_reader_stats`
+  mengambil snapshot terbaru saja
+- `examples/demo-sqlite/index.html` — demo ketiga: engine SQLite dimuat sebagai
+  WebAssembly (sql.js via CDN), file `.db` di-fetch, lalu view dipetakan ke
+  format `{ kodeISO: nilai }` oleh adapter kustom
+- Palet cokelat-krem (`#f5deb3` → `#8b4513`) untuk membedakan dari dua demo lain
+
+### Pengujian
+
+- Verifikasi isi database langsung via Python: view mengembalikan 24 entri
+  snapshot terbaru (ID → 85.5, bukan 85.0 periode Juli)
+- Semua aset HTTP 200 (halaman demo, peta.db 20 KB, library, locale)
+
+---
+
 ## Rencana Versi Berikutnya (Backlog)
 
-- [ ] Adapter runtime SQLite (mengonsumsi `database/schema.sql`)
 - [ ] (Opsional) publish npm / GitHub publik

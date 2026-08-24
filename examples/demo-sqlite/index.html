@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo SQLite — Data dari peta.db</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css">
+  <style>
+    body { margin: 0; background-color: #2d2a26; font-family: "Segoe UI", Arial, sans-serif; }
+    #sqlite-map { width: 100%; height: 100vh; }
+    .jsvectormap-tooltip {
+      background-color: rgba(0, 0, 0, 0.75);
+      border: none;
+      border-radius: 4px;
+      color: #f2f2f2;
+      padding: 8px 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="sqlite-map"></div>
+
+  <!-- Dependency eksternal -->
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/sql-wasm.js"></script>
+
+  <!-- Library + plugin locale -->
+  <script src="../../map-renderer.js"></script>
+  <script src="../../locales/id.js"></script>
+
+  <script>
+    /*
+     * Demo adapter SQLite runtime via sql.js (WebAssembly).
+     * Tidak ada perubahan pada library inti — memanfaatkan
+     * adapter "fungsi async kustom" dari V4.
+     *
+     * Alur: initSqlJs (WASM) -> fetch peta.db -> query view
+     * latest_reader_stats -> { kodeISO: nilai } -> render peta.
+     */
+    (async function () {
+      try {
+        // 1. Muat engine SQLite WebAssembly
+        const SQL = await initSqlJs({
+          locateFile: (file) =>
+            "https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/" + file
+        });
+
+        // 2. Muat file database
+        const res = await fetch("peta.db");
+        if (!res.ok) throw new Error("HTTP " + res.status + " saat memuat peta.db");
+        const db = new SQL.Database(new Uint8Array(await res.arrayBuffer()));
+
+        // 3. Render peta dengan adapter fungsi kustom
+        DemographicMap.init({
+          selector: "#sqlite-map",
+          locale: "id",
+          colorScale: ["#f5deb3", "#8b4513"],
+          tooltipFormat: "{name} {value}% of Readers",
+          zoomButtons: true,
+          legend: { title: "Pembaca (SQLite)", position: "bottom-left" },
+
+          dataAdapter: async () => {
+            const stmt = db.prepare(
+              "SELECT code, value FROM latest_reader_stats ORDER BY code"
+            );
+            const data = {};
+            while (stmt.step()) {
+              const row = stmt.get();
+              data[row[0]] = row[1];
+            }
+            stmt.free();
+            console.log("[demo-sqlite] Data dari peta.db:", Object.keys(data).length, "negara");
+            return data;
+          },
+
+          onLoaded() {
+            console.log("[demo-sqlite] Peta dirender dari SQLite (v" + DemographicMap.VERSION + ")");
+          },
+          onError(err) {
+            console.error("[demo-sqlite] Gagal:", err.message);
+          }
+        });
+      } catch (err) {
+        console.error("[demo-sqlite] Inisialisasi gagal:", err.message);
+      }
+    })();
+  </script>
+</body>
+</html>
