@@ -1,9 +1,9 @@
 // Entry demo: konsumsi library DemographicMap dengan konfigurasi projek ini.
-// V4 — data kini dimuat via adapter fetch JSON (bukan objek statis).
+// V4 — data dimuat via adapter fetch JSON; V5 — locale sebagai plugin ("id").
 DemographicMap.init({
   selector: "#map-container",
   dataAdapter: { type: "json", url: "data/reader-stats.json" },
-  locale: countryNamesID,
+  locale: "id",
   colorScale: ["#b8d8f2", "#0d3a66"],
   tooltipFormat: "{name} {value}% of Readers",
 

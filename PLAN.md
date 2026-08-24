@@ -91,8 +91,8 @@ DemographicMap.init({
 
 ### Kriteria Selesai
 
-- [ ] Library terpakai via satu file bundel ATAU satu import ES Module
-- [ ] Menambah bahasa baru tidak mengubah kode inti
+- [x] Library terpakai via satu file bundel ATAU satu import ES Module
+- [x] Menambah bahasa baru tidak mengubah kode inti
 
 ---
 
@@ -111,4 +111,6 @@ DemographicMap.init({
 | V2 — Refactor Public API | ✅ Selesai (lihat ARCHITECTURE.md) |
 | V3 — Fitur visual & interaksi | ✅ Selesai (lihat ARCHITECTURE.md) |
 | V4 — Data adapter | ✅ Selesai (lihat ARCHITECTURE.md) |
-| V5 — Packaging & i18n | 🔜 Berikutnya |
+| V5 — Packaging & i18n | ✅ Selesai (lihat ARCHITECTURE.md) |
+
+**Roadmap V1–V5 tuntas.** Lanjutan opsional: adapter runtime SQLite, publish npm/GitHub.

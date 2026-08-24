@@ -1,7 +1,17 @@
-// Layer terjemahan: kode ISO 3166-1 alpha-2 -> nama negara bahasa Indonesia.
-// Negara yang tidak ada di pemetaan ini akan fallback ke nama bawaan dataset.
-
-const countryNamesID = {
+﻿// ============================================================
+// DemographicMap — Plugin Locale Bahasa Indonesia (v5)
+//
+// Cara pakai:
+//   1. Muat SETELAH map-renderer.js:
+//      <script src="map-renderer.js"></script>
+//      <script src="locales/id.js"></script>
+//   2. Aktifkan via opsi init: locale: "id"
+//
+// Menambah bahasa baru = buat file serupa di folder locales/
+// dan panggil registerLocale("kode", {...}) — tanpa menyentuh
+// kode inti library.
+// ============================================================
+DemographicMap.registerLocale("id", {
   // Eropa
   "AD": "Andorra",
   "AL": "Albania",
@@ -144,7 +154,7 @@ const countryNamesID = {
   "NA": "Namibia",
   "NE": "Niger",
   "NG": "Nigeria",
-  "RE": "Réunion",
+  "RE": "RÃ©union",
   "RW": "Rwanda",
   "SC": "Seychelles",
   "SD": "Sudan",
@@ -171,7 +181,7 @@ const countryNamesID = {
   "AR": "Argentina",
   "AW": "Aruba",
   "BB": "Barbados",
-  "BL": "Saint Barthélemy",
+  "BL": "Saint BarthÃ©lemy",
   "BM": "Bermuda",
   "BO": "Bolivia",
   "BR": "Brasil",
@@ -262,4 +272,4 @@ const countryNamesID = {
   "SJ": "Svalbard dan Jan Mayen",
   "TF": "Wilayah Sejauh Selatan Prancis",
   "UM": "Kepulauan Kecil Terluar Amerika Serikat"
-};
+});

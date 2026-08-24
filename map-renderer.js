@@ -1,6 +1,9 @@
 /*
- * DemographicMap v4.0.0
+ * DemographicMap v5.0.0
  * Mini-library choropleth di atas jsVectorMap.
+ *
+ * Distribusi: single-file bundle (global `DemographicMap`) — cukup satu
+ * <script src="map-renderer.js">, tanpa tooling build.
  *
  * Konsumsi:
  *   DemographicMap.init({
@@ -11,20 +14,42 @@
  *     dataAdapter: { type: "api", url: "/api", parse: (j) => j.data },
  *     dataAdapter: async () => ({ ID: 85 }),             // fungsi kustom
  *     colorScale: ["#b8d8f2", "#0d3a66"],
- *     locale: countryNamesID,
+ *     locale: "id",                                      // plugin locale terdaftar
  *     tooltipFormat: "{name} {value}% of Readers",
  *     zoomOnScroll: false,
  *     zoomButtons: true,
  *     legend: { title: "Persentase Pembaca" }
  *   });
  *
+ * Plugin bahasa: DemographicMap.registerLocale("kode", { ID: "Indonesia", ... })
+ * — tambah bahasa baru tidak pernah menyentuh kode inti.
+ *
  * init() mengembalikan Promise yang resolve berupa instance jsVectorMap
- * setelah data selesai dimuat dan peta terender.
+ * setelah data selesai dimuat dan peta terrender.
  */
 const DemographicMap = (function () {
   "use strict";
 
-  const VERSION = "4.0.0";
+  const VERSION = "5.0.0";
+
+  // Registry plugin locale: nama -> pemetaan { kodeISO: namaLokal }
+  const LOCALES = {};
+
+  function registerLocale(name, mapping) {
+    if (typeof name !== "string" || !mapping || typeof mapping !== "object") {
+      throw new Error("registerLocale membutuhkan nama string dan objek pemetaan");
+    }
+    LOCALES[name] = mapping;
+  }
+
+  function resolveLocale(localeOption) {
+    if (!localeOption) return null;
+    if (typeof localeOption === "string") {
+      return LOCALES[localeOption] || null;
+    }
+    return localeOption;
+  }
+
 
   const DEFAULTS = {
     selector: "#map-container",
@@ -287,6 +312,9 @@ const DemographicMap = (function () {
   function init(userOptions) {
     const o = Object.assign({}, DEFAULTS, userOptions);
 
+    // Resolusi locale: string ("id") dari registry, atau objek kustom
+    o.locale = resolveLocale(o.locale);
+
     // Shorthand kompatibilitas: zoom: true mengaktifkan keduanya
     if (o.zoom === true) {
       o.zoomOnScroll = true;
@@ -385,5 +413,5 @@ const DemographicMap = (function () {
     })();
   }
 
-  return { init, VERSION };
+  return { init, VERSION, registerLocale };
 })();

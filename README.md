@@ -54,3 +54,81 @@ python -m http.server 8000 --bind 127.0.0.1
 > Alternatif tanpa Python: ekstensi **Live Server** di VS Code, atau `npx serve` jika sudah terpasang Node.js.
 
 Setelah server berjalan, uji interaksi dengan menggerakkan kursor di atas peta — negara dengan data akan tersorot gradasi biru dan menampilkan tooltip persentase pembaca.
+
+### 5. Menggunakan DemographicMap sebagai Library
+
+Sejak V2, logika inti peta dikemas sebagai mini-library mandiri dalam satu file bundle (`map-renderer.js`, global `DemographicMap`). Projek lain cukup memuat jsvectormap + library + plugin locale, lalu memanggil `init()` — tanpa pernah mengedit file library.
+
+#### Setup Minimal
+
+```html
+<!-- Dependency eksternal -->
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"></script>
+
+<!-- Library + plugin (urutan penting) -->
+<script src="map-renderer.js"></script>
+<script src="locales/id.js"></script>   <!-- opsional -->
+```
+
+#### Referensi Opsi `DemographicMap.init(options)`
+
+| Opsi | Tipe | Default | Keterangan |
+|---|---|---|---|
+| `selector` | string | `"#map-container"` | Kontainer target render |
+| `map` | string | `"world"` | Dataset jsVectorMap |
+| `data` | object | `{}` | Static adapter: `{ "ID": 85, ... }` |
+| `dataAdapter` | object\|function | `null` | Sumber data async (lihat tabel di bawah); menimpa `data` |
+| `colorScale` | [hex, hex] | abu-biru | Gradasi warna `[nilaiRendah, nilaiTinggi]` |
+| `defaultFill` | hex | `"#f2f2f2"` | Warna negara tanpa data |
+| `hoverOpacity` | number | `0.8` | Opasitas saat hover |
+| `locale` | string\|object | `null` | `"id"` (plugin terdaftar) atau objek `{ "US": "Amerika Serikat" }` |
+| `tooltipFormat` | string | `"{name} {value}% of Readers"` | Token `{name}` & `{value}` |
+| `zoomOnScroll` | boolean | `false` | Zoom via scroll (membajak scroll halaman!) |
+| `zoomButtons` | boolean | `false` | Tombol +/− di pojok kiri atas |
+| `legend` | boolean\|object | `false` | `{ title?, unit?, position? }` — posisi: `bottom-right` (default), `bottom-left`, `top-right`, `top-left` |
+| `onLoaded()` | function | `null` | Peta selesai dirender |
+| `onRegionHover(code, value)` | function | `null` | Hover pada region |
+| `onRegionClick(code, value)` | function | `null` | Klik region |
+| `onError(err)` | function | `null` | Gagal memuat data |
+
+Return value: **Promise** → resolve instance jsVectorMap, atau `null` bila gagal.
+
+#### Data Adapter
+
+```js
+// 1. Static object (tanpa dataAdapter)
+DemographicMap.init({ selector: "#peta", data: { ID: 85, US: 30 } });
+
+// 2. Fetch JSON datar { "ID": 85, ... }
+DemographicMap.init({ selector: "#peta", dataAdapter: { type: "json", url: "data.json" } });
+
+// 3. Endpoint API dengan struktur respons kustom
+DemographicMap.init({
+  selector: "#peta",
+  dataAdapter: {
+    type: "api",
+    url: "/api/stats",
+    parse: (json) => json.data   // wajib menghasilkan { kodeISO: nilai }
+  }
+});
+
+// 4. Fungsi async kustom (WebSocket, IndexedDB, SQLite, dll)
+DemographicMap.init({ selector: "#peta", dataAdapter: async () => ambilDataDariDatabase() });
+```
+
+#### Plugin Bahasa
+
+```js
+// locales/es.js
+DemographicMap.registerLocale("es", { US: "Estados Unidos", ID: "Indonesia" });
+
+// lalu aktifkan:
+DemographicMap.init({ selector: "#peta", locale: "es", ... });
+```
+
+Menambah bahasa baru tidak pernah menyentuh kode inti — cukup file baru di folder `locales/`. Negara tanpa terjemahan otomatis fallback ke nama bawaan dataset.
+
+#### Contoh Lengkap
+
+Lihat `examples/demo-penjualan/index.html` — projek kedua dengan palet ungu, zoom aktif, legenda, dan data terpisah dari demo utama.

@@ -215,7 +215,50 @@ Renderer kini tidak lagi terikat pada objek statis: `init()` menerima opsi `data
 
 ---
 
+## Versi 5 (V5) — Packaging & i18n Plugin
+
+**Status:** Selesai dan teruji berjalan — roadmap V1–V5 tuntas
+
+### Ringkasan
+
+Library distibusikan sebagai **single-file bundle** (global `DemographicMap`, satu `<script>`, tanpa build tooling) dan sistem bahasa diubah menjadi **plugin locale**: menambah bahasa baru tidak pernah menyentuh kode inti.
+
+### Perubahan
+
+1. **Locale plugin API** — `DemographicMap.registerLocale("kode", { ISO: nama, ... })`; opsi `locale` kini menerima string kode registry (`"id"`) atau objek kustom langsung. Locale tidak dikenal → fallback aman ke nama bawaan dataset
+2. **BREAKING**: `country-names.js` dihapus → diganti `locales/id.js` yang memanggil `registerLocale("id", ...)`; global `countryNamesID` tidak ada lagi
+3. **Versioning semantik + changelog** — riwayat lengkap v1–v5 di `CHANGELOG.md`
+4. **Dokumentasi API lengkap** di README bagian 5: tabel semua opsi, pola data adapter, plugin bahasa, contoh setup minimal
+
+### Struktur File Akhir
+
+```
+InteractiveChoroplethMap/
+├── index.html                  # Demo utama
+├── style.css                   # Tema demo utama
+├── map-renderer.js             # INTI LIBRARY — single-file bundle v5.0.0
+├── main.js                     # Entry demo utama
+├── locales/
+│   └── id.js                   # Plugin locale bahasa Indonesia
+├── data/
+│   └── reader-stats.json       # Data demo utama (via adapter json)
+├── database/
+│   └── schema.sql              # Persiapan skema SQLite
+├── examples/
+│   └── demo-penjualan/         # Contoh projek kedua
+├── data-source.js              # Legacy: contoh static adapter (tidak dimuat)
+└── *.md                        # README, DESIGN, TODO, MOCKUP-V1, PLAN, ARCHITECTURE, CHANGELOG
+```
+
+### Pengujian
+
+- Smoke test Node: registerLocale valid/invalid, locale string terdaftar/tak dikenal, objek kustom, evaluasi `locales/id.js`
+- Verifikasi tooltip end-to-end dengan mock: `US → "Amerika Serikat 30.5% of Readers"`, `IE → "Irlandia"`
+- Semua aset HTTP 200
+
+---
+
 ## Rencana Versi Berikutnya (Backlog)
 
-- [ ] V5 — ES Modules atau bundel tunggal, locale sebagai plugin, versioning semantik
 - [ ] Adapter runtime SQLite (mengonsumsi `database/schema.sql`)
+- [ ] (Opsional) publish npm / GitHub publik
