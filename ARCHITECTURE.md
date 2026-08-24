@@ -154,8 +154,35 @@ Semua opsi punya default yang identik dengan tampilan V1; `init()` mengembalikan
 
 ---
 
+## Versi 3 (V3) — Fitur Visual & Interaksi
+
+**Status:** Selesai dan teruji berjalan
+
+### Ringkasan
+
+Library kini mendukung zoom/pan, legenda gradasi warna otomatis, dan callback event. Demo utama mengaktifkan semuanya; responsivitas mobile ditambahkan via media query CSS.
+
+### Fitur Baru
+
+1. **Zoom/pan interaktif** — opsi granular `zoomOnScroll` dan `zoomButtons` (default keduanya `false`); `zoom: true` tetap didukung sebagai shorthand mengaktifkan keduanya. Rekomendasi UX: gunakan tombol saja agar scroll halaman tidak terbajak
+2. **Legenda gradasi otomatis** — opsi `legend: { title?, unit?, position? }` merender overlay HTML ringkas berisi bar gradien CSS (`linear-gradient` dari `colorScale`) plus label `0` → nilai maksimum data, lengkap dengan tombol tutup (×). Style di-inject sekali per halaman (`injectLegendCss`), posisi tersedia di 4 sudut kontainer
+3. **Callback event** — `onLoaded()`, `onRegionHover(code, value)`, `onRegionClick(code, value)` untuk hook logika per-projek
+4. **Responsif mobile** — media query ≤768px: kontainer 70vh + tooltip lebih ringkas
+
+### Penyempurnaan UX (v3.1.0 – v3.2.0, masukan pengguna)
+
+- Scroll-zoom dinonaktifkan di demo utama karena membajak scroll halaman dan terasa mengganggu — kini cukup tombol zoom
+- Legenda dipindah ke pojok kiri bawah (bottom-right menutupi area Asia Tenggara) dan dibuat lebih ringkas
+- v3.2.0: tombol tutup (×) diganti **ikon mata toggle** — klik untuk sembunyikan (ikon berubah jadi mata tertutup) dan klik lagi untuk tampilkan; panel legenda tidak pernah hilang permanen
+
+### Pengujian
+
+- Smoke test Node: versi 3.0.0, style legenda ter-inject saat `onLoaded` (bukan saat init), callback pass-through terdaftar benar
+- Semua aset HTTP 200 (demo utama + demo penjualan)
+
+---
+
 ## Rencana Versi Berikutnya (Backlog)
 
-- [ ] V3 — Zoom/pan interaktif di demo utama, legenda gradasi warna, responsivitas mobile
 - [ ] V4 — Data adapter: static object / fetch JSON / API endpoint / persiapan SQLite
 - [ ] V5 — ES Modules atau bundel tunggal, locale sebagai plugin, versioning semantik

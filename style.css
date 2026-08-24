@@ -19,3 +19,15 @@ body {
   padding: 8px 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
+
+/* Responsif — layar mobile */
+@media (max-width: 768px) {
+  #map-container {
+    height: 70vh;
+  }
+
+  .jsvectormap-tooltip {
+    font-size: 11px;
+    padding: 6px 9px;
+  }
+}

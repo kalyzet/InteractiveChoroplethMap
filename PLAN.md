@@ -57,9 +57,9 @@ DemographicMap.init({
 
 ### Kriteria Selesai
 
-- [ ] Zoom berfungsi mulus dan tooltip tetap akurat mengikuti kursor
-- [ ] Legenda muncul otomatis berdasarkan `colorScale`
-- [ ] Callback terpicu dan bisa diverifikasi lewat `console.log` di demo
+- [x] Zoom berfungsi mulus dan tooltip tetap akurat mengikuti kursor
+- [x] Legenda muncul otomatis berdasarkan `colorScale`
+- [x] Callback terpicu dan bisa diverifikasi lewat `console.log` di demo
 
 ---
 
@@ -109,6 +109,6 @@ DemographicMap.init({
 |---|---|
 | V1 — Prototipe kloroplet dasar | ✅ Selesai (lihat ARCHITECTURE.md) |
 | V2 — Refactor Public API | ✅ Selesai (lihat ARCHITECTURE.md) |
-| V3 — Fitur visual & interaksi | 🔜 Berikutnya |
-| V4 — Data adapter | Belum dimulai |
+| V3 — Fitur visual & interaksi | ✅ Selesai (lihat ARCHITECTURE.md) |
+| V4 — Data adapter | 🔜 Berikutnya |
 | V5 — Packaging & i18n | Belum dimulai |

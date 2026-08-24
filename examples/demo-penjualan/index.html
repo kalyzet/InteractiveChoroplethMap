@@ -33,7 +33,9 @@
       colorScale: ["#e0c3fc", "#6a1b9a"],
       defaultFill: "#3a3a5c",
       tooltipFormat: "{name}: {value} sales",
-      zoom: true,
+      zoomButtons: true,
+      zoomOnScroll: true,
+      legend: { title: "Sales", unit: "", position: "bottom-left" },
       onLoaded() {
         console.log("Demo kedua siap");
       }
