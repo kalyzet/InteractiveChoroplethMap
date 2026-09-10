@@ -1,0 +1,49 @@
+{
+  "name": "@kalyzet/demographic-map",
+  "version": "5.1.0",
+  "description": "Mini-library JavaScript vanilla untuk peta kloroplet (choropleth) dunia yang interaktif — tooltip, zoom, legenda otomatis.",
+  "main": "dist/map-renderer.js",
+  "module": "dist/demographic-map.esm.js",
+  "exports": {
+    ".": {
+      "import": "./dist/demographic-map.esm.js",
+      "require": "./dist/map-renderer.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": true,
+  "peerDependencies": {
+    "jsvectormap": "1.5.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kalyzet/InteractiveChoroplethMap.git"
+  },
+  "keywords": [
+    "choropleth",
+    "map",
+    "demographic",
+    "data-visualization",
+    "jsvectormap",
+    "interactive-map",
+    "vanilla-js",
+    "no-framework"
+  ],
+  "author": "Muhammad Haikal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kalyzet/InteractiveChoroplethMap/issues"
+  },
+  "homepage": "https://github.com/kalyzet/InteractiveChoroplethMap#readme",
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "build": "node scripts/build-dist.mjs",
+    "test": "node scripts/test-dist.mjs"
+  }
+}

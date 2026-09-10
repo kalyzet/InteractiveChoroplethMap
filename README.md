@@ -3,6 +3,7 @@
 > Mini-library JavaScript murni untuk peta kloroplet (choropleth) dunia yang interaktif — satu file bundle, tanpa build tooling, tanpa framework.
 
 [![Version](https://img.shields.io/badge/version-5.1.0-blue)](docs/CHANGELOG.md)
+[![npm](https://img.shields.io/npm/v/@kalyzet/demographic-map?label=npm&color=cb3837)](https://www.npmjs.com/package/@kalyzet/demographic-map)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 [![GitHub](https://img.shields.io/badge/repo-kalyzet%2FInteractiveChoroplethMap-181717?logo=github)](https://github.com/kalyzet/InteractiveChoroplethMap)
 
@@ -37,6 +38,22 @@ python -m http.server
 Lalu buka `http://localhost:8000`.
 
 Alternatif: ekstensi **Live Server** (VS Code) atau `npx serve`.
+
+## Instalasi
+
+### npm (untuk projek berbasis bundler/Node)
+
+```bash
+npm install @kalyzet/demographic-map jsvectormap
+```
+
+### CDN / `<script>` tag (tanpa bundler)
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@kalyzet/demographic-map@5/dist/map-renderer.js"></script>
+```
+
+`jsvectormap` tetap harus dimuat secara terpisah — lihat [Setup Minimal](#setup-minimal).
 
 ## Menggunakan Library
 
@@ -217,7 +234,7 @@ Dokumentasi mendalam tersedia di folder [`docs/`](docs/):
 
 - [x] Publish ke [GitHub Releases](https://github.com/kalyzet/InteractiveChoroplethMap/releases)
 - [x] Distribusi ES Module (`import DemographicMap from ...`)
-- [ ] Publish ke npm
+- [ ] Publish ke npm (`npm publish --access public`)
 
 ## Lisensi
 
